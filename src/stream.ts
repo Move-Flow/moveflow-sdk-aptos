@@ -13,13 +13,28 @@ export const ContractAddress = {
   Testnet: "0x04836e267e5290dd8c4e21a0afa83e7c5f589005f58cc6fae76407b90f5383da",
 };
 
-export type CreateStreamParams = {
+export interface CreateStreamOptions {
   name: string;
   description: string;
   amount: number;
   duration: number;
   is_fa: boolean;
-};
+}
+
+export class CreateStreamParams {
+  private _options: CreateStreamOptions;
+  constructor(options: CreateStreamOptions) {
+    this._options = options;
+  }
+
+  getTypeArguments() {
+    return [];
+  }
+
+  getFunctionArguments() {
+    return [];
+  }
+}
 
 export type StreamConfig = {};
 
@@ -48,8 +63,12 @@ export class Stream {
   public async createStream(options: CreateStreamParams) {
     const aptos = this.getAptosClient();
     let tx: SimpleTransaction = await aptos.transaction.build.simple({
-      sender: "",
-      data: {} as any,
+      sender: this._sender,
+      data: {
+        function: this.getEntryFunction("stream", "") as any,
+        typeArguments: options.getTypeArguments(),
+        functionArguments: options.getFunctionArguments(),
+      },
     });
     return tx;
   }
