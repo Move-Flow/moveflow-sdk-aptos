@@ -1,6 +1,11 @@
-import { Network } from "@aptos-labs/ts-sdk";
+import {
+  AccountAddress,
+  Network,
+  PendingTransactionResponse,
+  SimpleTransaction,
+} from "@aptos-labs/ts-sdk";
 import { Stream, aptos } from "../../src";
-import { test_private_key } from "../config";
+import { default_to_address, test_private_key } from "../config";
 import assert from "assert";
 
 describe("new stream object", () => {
@@ -58,5 +63,93 @@ describe("new stream object", () => {
     );
     const custom_info = await custom_stream.getAptosClient().getLedgerInfo();
     assert(custom_info.chain_id === 1, "chain id should be 1");
+  });
+
+  it("get current test account balance", async () => {
+    const test_stream = new Stream(account.accountAddress, Network.TESTNET);
+    const aptos = test_stream.getAptosClient();
+    const balance = await aptos.getAccountAPTAmount({
+      accountAddress: account.accountAddress,
+    });
+    assert(balance > 0, "testnet balance must big than 0 ");
+  });
+
+  it("pass signer to stream", async () => {
+    const test_stream = new Stream(account, Network.TESTNET);
+    assert(test_stream.isSenderSigner(), "isSendSigner must return true");
+    const address = test_stream.getSenderAddress();
+    assert(
+      address.toString() == account.accountAddress.toString(),
+      "address should returned."
+    );
+  });
+
+  it("transfer use signer", async () => {
+    const test_stream = new Stream(account, Network.TESTNET);
+    const aptos = test_stream.getAptosClient();
+
+    const checkingAddress = AccountAddress.from(default_to_address);
+
+    const beforeBalance = await aptos.getAccountAPTAmount({
+      accountAddress: checkingAddress,
+    });
+
+    const transfer_amount = 1000;
+
+    const tx = (await test_stream.transfer(
+      AccountAddress.from(default_to_address),
+      transfer_amount
+    )) as PendingTransactionResponse;
+
+    await aptos.waitForTransaction({
+      transactionHash: tx.hash,
+      options: { checkSuccess: true },
+    });
+
+    const postBalance = await aptos.getAccountAPTAmount({
+      accountAddress: checkingAddress,
+    });
+
+    assert(
+      postBalance - beforeBalance - transfer_amount == 0,
+      "transfer action should be done"
+    );
+  });
+
+  it("transfer use address", async () => {
+    const test_stream = new Stream(account.accountAddress, Network.TESTNET);
+    const aptos = test_stream.getAptosClient();
+
+    const checkingAddress = AccountAddress.from(default_to_address);
+
+    const beforeBalance = await aptos.getAccountAPTAmount({
+      accountAddress: checkingAddress,
+    });
+
+    const transfer_amount = 1000;
+
+    const tx = (await test_stream.transfer(
+      AccountAddress.from(default_to_address),
+      transfer_amount
+    )) as SimpleTransaction;
+
+    const sign = await aptos.signAndSubmitTransaction({
+      signer: account,
+      transaction: tx,
+    });
+
+    await aptos.waitForTransaction({
+      transactionHash: sign.hash,
+      options: { checkSuccess: true },
+    });
+
+    const postBalance = await aptos.getAccountAPTAmount({
+      accountAddress: checkingAddress,
+    });
+
+    assert(
+      postBalance - beforeBalance - transfer_amount == 0,
+      "transfer action should be done"
+    );
   });
 });
