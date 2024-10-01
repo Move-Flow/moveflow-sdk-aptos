@@ -98,13 +98,20 @@ export class Stream {
     }
   }
 
-  public async resumeStream(options: StreamOperateParams) {
-    options.setOperateType(OperateType.Resume);
-    return this.operateStream(options);
-  }
+  public async batchCreateSteam() {}
+
+  public async extendStream() {}
+  public async closeStream() {}
+  public async withdrawStream() {}
+  public async batchWithdrawStream() {}
 
   public async pauseStream(options: StreamOperateParams) {
     options.setOperateType(OperateType.Pause);
+    return this.operateStream(options);
+  }
+
+  public async resumeStream(options: StreamOperateParams) {
+    options.setOperateType(OperateType.Resume);
     return this.operateStream(options);
   }
 

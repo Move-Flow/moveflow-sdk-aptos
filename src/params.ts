@@ -98,7 +98,6 @@ export class CreateStreamParams {
 export enum OperateType {
   Pause,
   Resume,
-  Claim,
 }
 
 export interface StreamOperateOptions {
