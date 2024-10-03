@@ -98,8 +98,8 @@ export class CreateStreamParams {
 export enum OperateType {
   Pause,
   Resume,
-  Extend,
   Close,
+  Extend,
   Claim,
 }
 
@@ -109,7 +109,7 @@ export interface StreamOperateOptions {
   coin_type?: string;
   execute?: boolean;
   operate_type: OperateType;
-  is_fa: boolean;
+  is_fa?: boolean;
 }
 
 export class StreamOperateParams {
@@ -128,6 +128,8 @@ export class StreamOperateParams {
         return this._options.is_fa ? [] : [this._options.coin_type];
       case OperateType.Resume:
         return [];
+      case OperateType.Close:
+        return this._options.is_fa ? [] : [this._options.coin_type];
     }
   }
 
@@ -136,6 +138,8 @@ export class StreamOperateParams {
       case OperateType.Pause:
         return [this._options.stream_id];
       case OperateType.Resume:
+        return [this._options.stream_id];
+      case OperateType.Close:
         return [this._options.stream_id];
     }
   }
@@ -146,6 +150,8 @@ export class StreamOperateParams {
         return this._options.is_fa ? "pause_fa" : "pause";
       case OperateType.Resume:
         return this._options.is_fa ? "resume_fa" : "resume";
+      case OperateType.Close:
+        return this._options.is_fa ? "close_fa" : "close";
     }
   }
 }

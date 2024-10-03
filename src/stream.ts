@@ -98,10 +98,13 @@ export class Stream {
   public async batchCreateSteam() {}
 
   public async extendStream() {}
-  public async closeStream() {}
+
   public async withdrawStream() {}
   public async batchWithdrawStream() {}
 
+  public async closeStream(options: StreamOperateParams) {
+    return this.operateStream(options);
+  }
   public async pauseStream(options: StreamOperateParams) {
     return this.operateStream(options);
   }
