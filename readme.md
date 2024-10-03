@@ -203,3 +203,80 @@ await client.waitForTransaction({
   },
 });
 ```
+
+### Extend one stream
+
+```typescript
+const stream_info = (await stream.fetchStream(stream_id)) as any;
+console.log("current stop_time : ", stream_info.stop_time);
+console.log("current interval : ", stream_info.interval);
+const new_extend_time =
+  Number(stream_info.stop_time) + Number(stream_info.interval) * 120;
+console.log("new stop_time : ", new_extend_time);
+
+const sig = (await stream.extendStream(
+  new StreamOperateParams({
+    stream_id:
+      "0x8c3d8cb2e1fdc2e5db4988522b76ae5a99a910d432935d10b0fceda19e42adef",
+    execute: true,
+    extend_time: new_extend_time,
+    coin_type: "0x1::aptos_coin::AptosCoin",
+  })
+)) as PendingTransactionResponse;
+console.log("extend transaction: ", sig.hash);
+```
+
+### fetch one stream info
+
+```typescript
+const stream_id =
+  "0x8c3d8cb2e1fdc2e5db4988522b76ae5a99a910d432935d10b0fceda19e42adef";
+
+const stream_info = await stream.fetchStream(stream_id);
+console.log(stream_info);
+```
+
+### withdraw stream
+
+```typescript
+const sig = (await stream.withdrawStream(
+  new StreamOperateParams({
+    stream_id:
+      "0x8c3d8cb2e1fdc2e5db4988522b76ae5a99a910d432935d10b0fceda19e42adef",
+    execute: true,
+    coin_type: "0x1::aptos_coin::AptosCoin",
+  })
+)) as PendingTransactionResponse;
+console.log("withdraw transaction: ", sig.hash);
+
+await client.waitForTransaction({
+  transactionHash: sig.hash,
+  options: {
+    checkSuccess: true,
+  },
+});
+```
+
+### Batch withdraw streams
+
+```typescript
+const tx = (await stream.batchWithdrawStream(
+  new BatchWithdrawParams({
+    is_fa: false,
+    stream_ids: [
+      "0xf1f5f103580f56393b5a259279c0648ef4756a5eff901ba7b66b2b94a9676f94",
+    ],
+    coin_type: "0x1::aptos_coin::AptosCoin",
+    execute: true,
+  })
+)) as PendingTransactionResponse;
+
+await client.waitForTransaction({
+  transactionHash: tx.hash,
+  options: {
+    checkSuccess: true,
+  },
+});
+
+console.log("batch withdraw tx : ", tx.hash);
+```
