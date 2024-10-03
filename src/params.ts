@@ -1,6 +1,89 @@
 import { AccountAddress, AnyNumber } from "@aptos-labs/ts-sdk";
 import { helper } from ".";
 
+export interface BatchCreateOptions {
+  // this only contains with fa_coin
+  asset_type?: string;
+  execute: boolean;
+  is_fa: boolean;
+  coin_type?: string;
+  names: string[];
+  _remark: string;
+  stream_type: StreamType;
+  recipients: AccountAddress[];
+  deposit_amounts: AnyNumber[];
+  cliff_amounts: AnyNumber[];
+  cliff_time: AnyNumber;
+  start_time: AnyNumber;
+  stop_time: AnyNumber;
+  interval: AnyNumber;
+  auto_withdraw: boolean;
+  auto_withdraw_interval: AnyNumber;
+  pauseable: OperateUser;
+  closeable: OperateUser;
+  recipient_modifiable: OperateUser;
+}
+
+export class BatchCreateParams {
+  private _options: BatchCreateOptions;
+
+  constructor(options: BatchCreateOptions) {
+    this._options = options;
+  }
+
+  getTypeArguments() {
+    return this._options.is_fa ? [] : [this._options.coin_type as string];
+  }
+
+  getFunctionArguments() {
+    if (this._options.is_fa) {
+      return [
+        this._options.names,
+        helper.StreamTypeToString(this._options.stream_type),
+        this._options.asset_type?.toString(),
+        this._options.recipients,
+        this._options.deposit_amounts,
+        this._options.cliff_amounts,
+        this._options.cliff_time,
+        this._options.start_time,
+        this._options.stop_time,
+        this._options.interval,
+        this._options.auto_withdraw,
+        this._options.auto_withdraw_interval,
+        helper.OperateUserToString(this._options.pauseable),
+        helper.OperateUserToString(this._options.closeable),
+        helper.OperateUserToString(this._options.recipient_modifiable),
+      ];
+    } else {
+      return [
+        this._options.names,
+        this._options._remark,
+        helper.StreamTypeToString(this._options.stream_type),
+        this._options.recipients,
+        this._options.deposit_amounts,
+        this._options.cliff_amounts,
+        this._options.cliff_time,
+        this._options.start_time,
+        this._options.stop_time,
+        this._options.interval,
+        this._options.auto_withdraw,
+        this._options.auto_withdraw_interval,
+        helper.OperateUserToString(this._options.pauseable),
+        helper.OperateUserToString(this._options.closeable),
+        helper.OperateUserToString(this._options.recipient_modifiable),
+      ];
+    }
+  }
+
+  isExecute() {
+    return this._options.execute;
+  }
+
+  getMethod() {
+    return this._options.is_fa ? "batchCreate_fa" : "batchCreate";
+  }
+}
+
 export interface CreateStreamOptions {
   execute: boolean;
   // this will contains with common coin

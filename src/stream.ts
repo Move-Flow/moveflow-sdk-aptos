@@ -7,7 +7,12 @@ import {
   Network,
   SimpleTransaction,
 } from "@aptos-labs/ts-sdk";
-import { CreateStreamParams, OperateType, StreamOperateParams } from "./params";
+import {
+  BatchCreateParams,
+  CreateStreamParams,
+  OperateType,
+  StreamOperateParams,
+} from "./params";
 import { ContractAddress, GlobalConfig } from "./config";
 
 export enum StreamEventType {
@@ -93,7 +98,29 @@ export class Stream {
     }
   }
 
-  public async batchCreateSteam() {}
+  public async batchCreateSteam(options: BatchCreateParams) {
+    const aptos = this.getAptosClient();
+    let tx: SimpleTransaction = await aptos.transaction.build.simple({
+      sender: this.getSenderAddress(),
+      data: {
+        function: this.getEntryFunction(
+          "stream",
+          options.getMethod() as string
+        ) as any,
+        typeArguments: options.getTypeArguments() as any,
+        functionArguments: options.getFunctionArguments() as any,
+      },
+    });
+
+    if (options.isExecute()) {
+      return await aptos.signAndSubmitTransaction({
+        signer: this._sender as Account,
+        transaction: tx,
+      });
+    } else {
+      return tx;
+    }
+  }
 
   public async batchWithdrawStream() {}
 
