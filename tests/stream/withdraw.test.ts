@@ -13,9 +13,6 @@ describe("stream operate test ", () => {
   const client = stream.getAptosClient();
 
   it("claim one stream ", async () => {
-    const stream_id =
-      "0x8c3d8cb2e1fdc2e5db4988522b76ae5a99a910d432935d10b0fceda19e42adef";
-
     const sig = (await stream.withdrawStream(
       new StreamOperateParams({
         stream_id:
