@@ -1,6 +1,39 @@
 import { AccountAddress, AnyNumber } from "@aptos-labs/ts-sdk";
 import { helper } from ".";
 
+export interface BatchWithdrawOptions {
+  // this only contains with fa_coin
+  asset_type?: string;
+  execute?: boolean;
+  is_fa: boolean;
+  coin_type?: string;
+  stream_ids: string[];
+}
+
+export class BatchWithdrawParams {
+  private _options: BatchWithdrawOptions;
+
+  constructor(options: BatchWithdrawOptions) {
+    this._options = options;
+  }
+
+  getTypeArguments() {
+    return this._options.is_fa ? [] : [this._options.coin_type as string];
+  }
+
+  isExecute() {
+    return this._options.execute;
+  }
+
+  getMethod() {
+    return this._options.is_fa ? "batch_withdraw_fa" : "batch_withdraw";
+  }
+
+  getFunctionArguments() {
+    return [this._options.stream_ids];
+  }
+}
+
 export interface BatchCreateOptions {
   // this only contains with fa_coin
   asset_type?: string;

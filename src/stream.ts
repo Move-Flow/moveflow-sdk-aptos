@@ -9,6 +9,7 @@ import {
 } from "@aptos-labs/ts-sdk";
 import {
   BatchCreateParams,
+  BatchWithdrawParams,
   CreateStreamParams,
   OperateType,
   StreamOperateParams,
@@ -29,6 +30,13 @@ export enum StreamEventType {
   RESUME = 110,
   SET_AUTO_WITHDRAW_ACCOUNT = 111,
   SET_AUTO_WITHDRAW_FEE = 112,
+}
+
+export interface PreparedTransaction {
+  isExecute(): boolean;
+  getMethod(): string;
+  getTypeArguments(): string[];
+  getFunctionArguments(): any[];
 }
 
 export class Stream {
@@ -79,76 +87,42 @@ export class Stream {
   }
 
   public async createStream(options: CreateStreamParams) {
-    const aptos = this.getAptosClient();
-    let tx: SimpleTransaction = await aptos.transaction.build.simple({
-      sender: this.getSenderAddress(),
-      data: {
-        function: this.getEntryFunction("stream", options.getMethod()) as any,
-        typeArguments: options.getTypeArguments(),
-        functionArguments: options.getFunctionArguments(),
-      },
-    });
-    if (options.isExecute()) {
-      return await aptos.signAndSubmitTransaction({
-        signer: this._sender as Account,
-        transaction: tx,
-      });
-    } else {
-      return tx;
-    }
+    return this.operateStream(options as PreparedTransaction);
   }
 
   public async batchCreateSteam(options: BatchCreateParams) {
-    const aptos = this.getAptosClient();
-    let tx: SimpleTransaction = await aptos.transaction.build.simple({
-      sender: this.getSenderAddress(),
-      data: {
-        function: this.getEntryFunction(
-          "stream",
-          options.getMethod() as string
-        ) as any,
-        typeArguments: options.getTypeArguments() as any,
-        functionArguments: options.getFunctionArguments() as any,
-      },
-    });
-
-    if (options.isExecute()) {
-      return await aptos.signAndSubmitTransaction({
-        signer: this._sender as Account,
-        transaction: tx,
-      });
-    } else {
-      return tx;
-    }
+    return this.operateStream(options as PreparedTransaction);
   }
-
-  public async batchWithdrawStream() {}
 
   public async withdrawStream(options: StreamOperateParams) {
     options.setOperateType(OperateType.Claim);
-    return this.operateStream(options);
+    return this.operateStream(options as PreparedTransaction);
+  }
+
+  public async batchWithdrawStream(options: BatchWithdrawParams) {
+    return this.operateStream(options as PreparedTransaction);
   }
 
   public async extendStream(options: StreamOperateParams) {
     options.setOperateType(OperateType.Extend);
-    return this.operateStream(options);
+    return this.operateStream(options as PreparedTransaction);
   }
 
   public async closeStream(options: StreamOperateParams) {
     options.setOperateType(OperateType.Close);
-    return this.operateStream(options);
+    return this.operateStream(options as PreparedTransaction);
   }
   public async pauseStream(options: StreamOperateParams) {
     options.setOperateType(OperateType.Pause);
-    return this.operateStream(options);
+    return this.operateStream(options as PreparedTransaction);
   }
 
   public async resumeStream(options: StreamOperateParams) {
     options.setOperateType(OperateType.Resume);
-    return this.operateStream(options);
+    return this.operateStream(options as PreparedTransaction);
   }
 
-  private async operateStream(options: StreamOperateParams) {
+  private async operateStream(options: PreparedTransaction) {
     const aptos = this.getAptosClient();
     let tx: SimpleTransaction = await aptos.transaction.build.simple({
       sender: this.getSenderAddress(),

@@ -1,5 +1,5 @@
 import { AccountAddress } from "@aptos-labs/ts-sdk";
-import { OperateType, OperateUser, StreamType } from "./params";
+import { OperateUser, StreamType } from "./params";
 
 const StreamTypeToString = (stream_type: StreamType) => {
   switch (stream_type) {

@@ -2,20 +2,15 @@ import {
   AccountAddress,
   Network,
   PendingTransactionResponse,
-  TransactionResponse,
-  UserTransactionResponse,
 } from "@aptos-labs/ts-sdk";
 import {
   BatchCreateParams,
-  CreateStreamParams,
   OperateUser,
   Stream,
-  StreamEventType,
   StreamType,
   aptos,
 } from "../../src";
-import { default_to_address, test_private_key } from "../config";
-import assert from "assert";
+import { test_private_key } from "../config";
 
 describe("create stream", async function () {
   const pair = new aptos.Ed25519PrivateKey(test_private_key);
