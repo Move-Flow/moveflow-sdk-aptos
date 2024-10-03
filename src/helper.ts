@@ -1,3 +1,4 @@
+import { AccountAddress } from "@aptos-labs/ts-sdk";
 import { OperateType, OperateUser, StreamType } from "./params";
 
 const StreamTypeToString = (stream_type: StreamType) => {
@@ -20,4 +21,22 @@ const OperateUserToString = (u: OperateUser) => {
   }
 };
 
-export { StreamTypeToString, OperateUserToString };
+const FixedAddress = (address: AccountAddress) => {
+  let s = address.toString();
+  return FixedStrAddress(s);
+};
+
+const FixedStrAddress = (s: string) => {
+  if (s.startsWith("0x0")) {
+    return "0x" + s.substring(3);
+  } else {
+    return s;
+  }
+};
+
+export {
+  StreamTypeToString,
+  OperateUserToString,
+  FixedAddress,
+  FixedStrAddress,
+};

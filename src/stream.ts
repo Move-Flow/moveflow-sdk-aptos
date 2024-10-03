@@ -8,6 +8,7 @@ import {
   SimpleTransaction,
 } from "@aptos-labs/ts-sdk";
 import { CreateStreamParams, OperateType, StreamOperateParams } from "./params";
+import { ContractAddress, GlobalConfig } from "./config";
 
 export enum StreamEventType {
   CREATE = 100,
@@ -25,17 +26,13 @@ export enum StreamEventType {
   SET_AUTO_WITHDRAW_FEE = 112,
 }
 
-export const ContractAddress = {
-  Mainnet: "0x15a5484b9f8369dd3d60c43e4530e7c1bb82eef041bf4cf8a2090399bebde5d4",
-  Testnet: "0x04836e267e5290dd8c4e21a0afa83e7c5f589005f58cc6fae76407b90f5383da",
-};
-
 export type StreamConfig = {};
 
 export class Stream {
   private _network: Network;
   private _url?: string;
   private _sender: AccountAddress | Account;
+  private _global?: GlobalConfig;
 
   constructor(
     sender: AccountAddress | Account,
@@ -106,12 +103,10 @@ export class Stream {
   public async batchWithdrawStream() {}
 
   public async pauseStream(options: StreamOperateParams) {
-    options.setOperateType(OperateType.Pause);
     return this.operateStream(options);
   }
 
   public async resumeStream(options: StreamOperateParams) {
-    options.setOperateType(OperateType.Resume);
     return this.operateStream(options);
   }
 
@@ -120,9 +115,12 @@ export class Stream {
     let tx: SimpleTransaction = await aptos.transaction.build.simple({
       sender: this.getSenderAddress(),
       data: {
-        function: this.getEntryFunction("stream", "") as any,
-        typeArguments: options.getTypeArguments(),
-        functionArguments: options.getFunctionArguments(),
+        function: this.getEntryFunction(
+          "stream",
+          options.getMethod() as string
+        ) as any,
+        typeArguments: options.getTypeArguments() as any,
+        functionArguments: options.getFunctionArguments() as any,
       },
     });
 
@@ -159,5 +157,22 @@ export class Stream {
       fullnode: this._url,
     });
     return new Aptos(config);
+  }
+
+  public async getGlobalConfig() {
+    if (!this._global) {
+      const client = this.getAptosClient();
+      const global = await client.getAccountResource({
+        accountAddress: this.getContractAddress(),
+        resourceType: `${this.getContractAddress()}::stream::GlobalConfig`,
+      });
+      this._global = new GlobalConfig(global);
+    }
+    return this._global;
+  }
+
+  public async fetchStream(stream_id: string) {
+    const g = await this.getGlobalConfig();
+    const client = this.getAptosClient();
   }
 }

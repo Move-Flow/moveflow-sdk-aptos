@@ -98,12 +98,18 @@ export class CreateStreamParams {
 export enum OperateType {
   Pause,
   Resume,
+  Extend,
+  Close,
+  Claim,
 }
 
 export interface StreamOperateOptions {
   stream_id: string;
-  execute: boolean;
+  // you should provide this param when operate common coin stream.
+  coin_type?: string;
+  execute?: boolean;
   operate_type: OperateType;
+  is_fa: boolean;
 }
 
 export class StreamOperateParams {
@@ -117,14 +123,29 @@ export class StreamOperateParams {
   }
 
   getTypeArguments() {
-    return [];
+    switch (this._options.operate_type) {
+      case OperateType.Pause:
+        return this._options.is_fa ? [] : [this._options.coin_type];
+      case OperateType.Resume:
+        return [];
+    }
   }
 
   getFunctionArguments() {
-    return [];
+    switch (this._options.operate_type) {
+      case OperateType.Pause:
+        return [this._options.stream_id];
+      case OperateType.Resume:
+        return [this._options.stream_id];
+    }
   }
 
-  setOperateType(t: OperateType) {
-    this._options.operate_type = t;
+  getMethod() {
+    switch (this._options.operate_type) {
+      case OperateType.Pause:
+        return this._options.is_fa ? "pause_fa" : "pause";
+      case OperateType.Resume:
+        return this._options.is_fa ? "resume_fa" : "resume";
+    }
   }
 }
