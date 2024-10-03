@@ -26,8 +26,6 @@ export enum StreamEventType {
   SET_AUTO_WITHDRAW_FEE = 112,
 }
 
-export type StreamConfig = {};
-
 export class Stream {
   private _network: Network;
   private _url?: string;
@@ -97,23 +95,33 @@ export class Stream {
 
   public async batchCreateSteam() {}
 
-  public async extendStream() {}
-
-  public async withdrawStream() {}
   public async batchWithdrawStream() {}
 
+  public async withdrawStream(options: StreamOperateParams) {
+    options.setOperateType(OperateType.Claim);
+    return this.operateStream(options);
+  }
+
+  public async extendStream(options: StreamOperateParams) {
+    options.setOperateType(OperateType.Extend);
+    return this.operateStream(options);
+  }
+
   public async closeStream(options: StreamOperateParams) {
+    options.setOperateType(OperateType.Close);
     return this.operateStream(options);
   }
   public async pauseStream(options: StreamOperateParams) {
+    options.setOperateType(OperateType.Pause);
     return this.operateStream(options);
   }
 
   public async resumeStream(options: StreamOperateParams) {
+    options.setOperateType(OperateType.Resume);
     return this.operateStream(options);
   }
 
-  public async operateStream(options: StreamOperateParams) {
+  private async operateStream(options: StreamOperateParams) {
     const aptos = this.getAptosClient();
     let tx: SimpleTransaction = await aptos.transaction.build.simple({
       sender: this.getSenderAddress(),
@@ -177,5 +185,14 @@ export class Stream {
   public async fetchStream(stream_id: string) {
     const g = await this.getGlobalConfig();
     const client = this.getAptosClient();
+    const contract = this.getContractAddress();
+    return await client.getTableItem({
+      handle: g.streams_store.toString(),
+      data: {
+        key_type: "address",
+        value_type: `${contract}::stream::StreamInfo`,
+        key: stream_id,
+      },
+    });
   }
 }

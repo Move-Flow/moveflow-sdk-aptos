@@ -108,8 +108,9 @@ export interface StreamOperateOptions {
   // you should provide this param when operate common coin stream.
   coin_type?: string;
   execute?: boolean;
-  operate_type: OperateType;
+  operate_type?: OperateType;
   is_fa?: boolean;
+  extend_time?: AnyNumber;
 }
 
 export class StreamOperateParams {
@@ -130,6 +131,10 @@ export class StreamOperateParams {
         return [];
       case OperateType.Close:
         return this._options.is_fa ? [] : [this._options.coin_type];
+      case OperateType.Extend:
+        return this._options.is_fa ? [] : [this._options.coin_type];
+      case OperateType.Claim:
+        return this._options.is_fa ? [] : [this._options.coin_type];
     }
   }
 
@@ -140,6 +145,10 @@ export class StreamOperateParams {
       case OperateType.Resume:
         return [this._options.stream_id];
       case OperateType.Close:
+        return [this._options.stream_id];
+      case OperateType.Extend:
+        return [this._options.extend_time, this._options.stream_id];
+      case OperateType.Claim:
         return [this._options.stream_id];
     }
   }
@@ -152,6 +161,14 @@ export class StreamOperateParams {
         return this._options.is_fa ? "resume_fa" : "resume";
       case OperateType.Close:
         return this._options.is_fa ? "close_fa" : "close";
+      case OperateType.Extend:
+        return this._options.is_fa ? "extend_fa" : "extend";
+      case OperateType.Claim:
+        return this._options.is_fa ? "withdraw_fa" : "withdraw";
     }
+  }
+
+  setOperateType(t: OperateType) {
+    this._options.operate_type = t;
   }
 }

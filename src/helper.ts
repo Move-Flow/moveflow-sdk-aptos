@@ -34,9 +34,14 @@ const FixedStrAddress = (s: string) => {
   }
 };
 
+const unixSeconds = () => {
+  return Math.floor(new Date().getTime() / 1000);
+};
+
 export {
   StreamTypeToString,
   OperateUserToString,
   FixedAddress,
   FixedStrAddress,
+  unixSeconds,
 };

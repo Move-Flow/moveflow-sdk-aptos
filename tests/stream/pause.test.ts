@@ -38,7 +38,6 @@ describe("stream operate test ", () => {
         stream_id:
           "0x297557e69964fd720177a5fad6f70ed1c9c6abe5a43710a68a68bedf2432a879",
         execute: true,
-        operate_type: OperateType.Pause,
         is_fa: true,
       })
     )) as PendingTransactionResponse;
