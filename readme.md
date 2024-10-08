@@ -6,7 +6,7 @@
 
 Move-Flow is able to transfer assets on chain according to predefined rules. With one transaction, funds will flow from your wallet to the recipient real-time(by second), to conduct timely financial transactions without intermediaries..
 
-This is the Typescript SDK for the protocol
+This is the Typescript SDK for the protocol.
 
 You can find [docs here](https://github.com/Move-Flow/moveflow-sdk-aptos)
 
