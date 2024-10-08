@@ -23,6 +23,7 @@ pnpm install @moveflow/aptos-sdk
 Init Stream Object with Ed25516 Private key, this kind of stream object can execute transaction directly.
 
 ```typescript
+import { Stream, aptos } from "@moveflow/aptos-sdk";
 const pair = new aptos.Ed25519PrivateKey(test_private_key);
 const account = aptos.Account.fromPrivateKey({
   privateKey: pair,

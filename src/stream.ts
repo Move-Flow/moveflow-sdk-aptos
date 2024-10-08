@@ -5,6 +5,7 @@ import {
   Aptos,
   AptosConfig,
   Network,
+  PaginationArgs,
   SimpleTransaction,
 } from "@aptos-labs/ts-sdk";
 import {
@@ -12,6 +13,7 @@ import {
   BatchWithdrawParams,
   CreateStreamParams,
   OperateType,
+  StreamDirection,
   StreamOperateParams,
 } from "./params";
 import { ContractAddress, GlobalConfig } from "./config";
@@ -193,6 +195,41 @@ export class Stream {
         key_type: "address",
         value_type: `${contract}::stream::StreamInfo`,
         key: stream_id,
+      },
+    });
+  }
+
+  /**
+   * This function is still under development. Use with caution.
+   * @deprecated
+   */
+  public async getStreams(direction: StreamDirection, pages: PaginationArgs) {
+    let w: any = {};
+    if (direction == StreamDirection.Incoming) {
+      w.recipient = this.getSenderAddress();
+    } else if (direction == StreamDirection.Outgoing) {
+      w.sender = this.getSenderAddress();
+    } else {
+    }
+
+    const g = await this.getGlobalConfig();
+    const client = this.getAptosClient();
+    return await client.getTableItemsData({
+      options: {
+        where: {
+          table_handle: {
+            _eq: g.streams_store.toString(),
+          },
+          decoded_value: {
+            _contains: w,
+          },
+        },
+        orderBy: [
+          {
+            transaction_version: "desc",
+          },
+        ],
+        ...pages,
       },
     });
   }

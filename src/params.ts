@@ -1,6 +1,12 @@
 import { AccountAddress, AnyNumber } from "@aptos-labs/ts-sdk";
 import { helper } from ".";
 
+export enum StreamDirection {
+  Incoming,
+  Outgoing,
+  Both,
+}
+
 export interface BatchWithdrawOptions {
   // this only contains with fa_coin
   asset_type?: string;
