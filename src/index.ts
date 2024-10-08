@@ -4,3 +4,4 @@ export { aptos };
 export * from "./stream";
 export * as helper from "./helper";
 export * from "./params";
+export * from "./config";
