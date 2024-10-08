@@ -1,6 +1,6 @@
 {
   "name": "@moveflow/aptos-sdk",
-  "version": "0.0.7",
+  "version": "0.0.10",
   "description": "MoveFlow Aptos SDK",
   "scripts": {
     "test": "mocha  --timeout 59000 --require ts-node/register",

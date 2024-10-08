@@ -1,24 +1,7 @@
-import {
-  Account,
-  AccountAddress,
-  CommittedTransactionResponse,
-  Network,
-  PendingTransactionResponse,
-  SimpleTransaction,
-  TransactionResponse,
-  UserTransactionResponse,
-} from "@aptos-labs/ts-sdk";
-import {
-  CreateStreamParams,
-  OperateUser,
-  Stream,
-  StreamEventType,
-  StreamType,
-  aptos,
-} from "../../src";
-import { default_to_address, test_private_key } from "../config";
+import { Network } from "@aptos-labs/ts-sdk";
+import { Stream, aptos } from "../../src";
+import { test_private_key } from "../config";
 import assert from "assert";
-import { exec } from "child_process";
 import { FixedStrAddress } from "../../src/helper";
 
 describe("global config load checking", () => {
@@ -64,5 +47,11 @@ describe("global config load checking", () => {
     });
 
     assert(items.length == 10, "should get 10 streams data");
+  });
+
+  it("load coin configs", async () => {
+    let configs = await stream.getRegisteredCoinConfigs();
+    console.log("configs", configs);
+    assert(configs.length > 1, "should get more than 1 coin configs");
   });
 });

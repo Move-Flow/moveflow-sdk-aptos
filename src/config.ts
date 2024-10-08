@@ -10,6 +10,7 @@ export class GlobalConfig {
   public streams_store: AccountAddress;
   public input_stream: AccountAddress;
   public output_stream: AccountAddress;
+  public coin_configs: AccountAddress;
 
   constructor(resource: any) {
     this.admin = AccountAddress.from(resource.admin);
@@ -18,5 +19,6 @@ export class GlobalConfig {
     );
     this.input_stream = AccountAddress.from(resource.input_stream.handle);
     this.output_stream = AccountAddress.from(resource.output_stream.handle);
+    this.coin_configs = AccountAddress.from(resource.coin_configs.handle);
   }
 }

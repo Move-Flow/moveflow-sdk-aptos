@@ -281,3 +281,10 @@ await client.waitForTransaction({
 
 console.log("batch withdraw tx : ", tx.hash);
 ```
+
+### Get registered coin configs
+
+```typescript
+const configs = await stream.getRegisteredCoinConfigs();
+console.log("configs", configs);
+```

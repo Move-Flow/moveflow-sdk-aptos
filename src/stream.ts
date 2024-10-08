@@ -185,6 +185,20 @@ export class Stream {
     return this._global;
   }
 
+  public async getRegisteredCoinConfigs() {
+    const g = await this.getGlobalConfig();
+    const client = this.getAptosClient();
+    return await client.getTableItemsData({
+      options: {
+        where: {
+          table_handle: {
+            _eq: g.coin_configs.toString(),
+          },
+        },
+      },
+    });
+  }
+
   public async fetchStream(stream_id: string) {
     const g = await this.getGlobalConfig();
     const client = this.getAptosClient();
