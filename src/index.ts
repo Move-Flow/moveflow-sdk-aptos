@@ -1,23 +1,87 @@
 import dotenv from "dotenv";
 import { Stream, aptos } from "@moveflow/aptos-sdk";
+import { getLogger } from "./util";
+import { Command } from "commander"; // Add this import
+import { readFileSync, appendFileSync } from "fs";
 
-const main = async () => {
-  dotenv.config();
-  const operatorPrivateKey: string = process.env.PrivateKey as string;
+dotenv.config();
+
+const program = new Command(); // Initialize commander
+
+const main = async (options: {
+  network: string;
+  token: string;
+  privateKey: string;
+  file: string;
+}) => {
+  const logger = getLogger();
+  const operatorPrivateKey: string =
+    options.privateKey || (process.env.PrivateKey as string);
   const pair = new aptos.Ed25519PrivateKey(operatorPrivateKey);
-  const network = process.env.NETWORK as aptos.Network;
+  const network = (options.network || process.env.NETWORK) as aptos.Network;
+  const airdropToken = (options.token || process.env.AirdropToken) as string;
+  const is_fa = airdropToken.indexOf("::") === -1;
   let account = aptos.Account.fromPrivateKey({
     privateKey: pair,
   });
-
   const stream = new Stream(account, network);
-  console.log("current sender : ", stream.getSenderAddress().toString());
-  console.log("current network : ", network);
+
+  const csv = readFileSync(options.file, "utf8");
+  const lines = csv.split("\n");
+  const airdropList = lines.map((line) => {
+    const [address, amount] = line.split(",");
+    return { address, amount: parseInt(amount) };
+  });
+
+  logger.info("current sender : %s", stream.getSenderAddress().toString());
+  logger.info("current network : %s", network);
 
   const client = stream.getAptosClient();
   const info = await client.getLedgerInfo();
-  console.log("try get chain info ");
-  console.table(info);
+  logger.info("try get chain info %s", JSON.stringify(info));
+  logger.info("airdrop token  : %s", airdropToken);
+  logger.info("is_fa : %s", is_fa);
+
+  logger.info("airdrop list : %d", airdropList.length);
 };
 
-main();
+// Define a default command with options
+program
+  .option("-p, --privateKey <privateKey>", "Specify the private key")
+  .option("-n, --network <network>", "Specify the network")
+  .option("-t, --token <token>", "Specify the airdrop token")
+  .option("-f, --file <file>", "Specify the csv file to read")
+  .action((options) => {
+    console.log("Executing default command with options...");
+    main(options);
+  });
+
+program
+  .command("generate-csv")
+  .option(
+    "--number <number>",
+    "Specify the number of accounts to generate",
+    "1000"
+  )
+  .action((options: { number: string }) => {
+    const logger = getLogger();
+    logger.info("Generating CSV... with number %s", options.number);
+
+    for (let i = 0; i < parseInt(options.number); i++) {
+      let account = aptos.Account.generate();
+      logger.info("Generated account: %s", account.accountAddress.toString());
+      let amount = Math.floor(Math.random() * 10000);
+      logger.info("Generated amount: %s", amount);
+      logger.info(
+        "Generated line: %s",
+        `${account.accountAddress.toString()},${amount}`
+      );
+
+      appendFileSync(
+        "airdrop.csv",
+        `${account.accountAddress.toString()},${amount}\n`
+      );
+    }
+  });
+
+program.parse(process.argv); // Parse command-line arguments
