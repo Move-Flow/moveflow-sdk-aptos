@@ -5,13 +5,19 @@ const main = async () => {
   dotenv.config();
   const operatorPrivateKey: string = process.env.PrivateKey as string;
   const pair = new aptos.Ed25519PrivateKey(operatorPrivateKey);
-  console.log(pair);
+  const network = process.env.NETWORK as aptos.Network;
   let account = aptos.Account.fromPrivateKey({
     privateKey: pair,
   });
-  console.log(account.publicKey);
-  const stream = new Stream(account, process.env.NETWORK as aptos.Network);
-  console.log(stream.getSenderAddress());
+
+  const stream = new Stream(account, network);
+  console.log("current sender : ", stream.getSenderAddress().toString());
+  console.log("current network : ", network);
+
+  const client = stream.getAptosClient();
+  const info = await client.getLedgerInfo();
+  console.log("try get chain info ");
+  console.table(info);
 };
 
 main();
