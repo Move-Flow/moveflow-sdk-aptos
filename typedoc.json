@@ -1,5 +1,4 @@
 {
   "out": "./docs",
-  "entryPoints": ["./src/index.ts"],
-  "exclude": ["./examples/stream-cli/src/index.ts"]
+  "entryPoints": ["./src/index.ts"]
 }
