@@ -1,5 +1,5 @@
 {
-  "name": "@moveflow-dev/aptos-sdk",
+  "name": "@moveflow/aptos-sdk",
   "version": "0.0.7",
   "description": "MoveFlow Aptos SDK",
   "scripts": {

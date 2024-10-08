@@ -10,6 +10,7 @@ import assert from "assert";
 
 describe("new stream object", () => {
   const pair = new aptos.Ed25519PrivateKey(test_private_key);
+  console.log(pair);
   const account = aptos.Account.fromPrivateKey({
     privateKey: pair,
   });

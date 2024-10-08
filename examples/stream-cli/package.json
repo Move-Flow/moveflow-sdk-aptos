@@ -1,0 +1,26 @@
+{
+  "name": "stream-cli",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "test-all": "mocha --require ts-node/register test/*/*.test.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/mocha": "^10.0.9",
+    "@types/node": "^22.7.5",
+    "mocha": "^10.7.3",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "@moveflow-dev/aptos-sdk": "^0.0.6",
+    "@moveflow/aptos-sdk": "^0.0.6",
+    "dotenv": "^16.4.5"
+  }
+}
