@@ -1,6 +1,18 @@
 import { AccountAddress } from "@aptos-labs/ts-sdk";
 import { OperateUser, StreamType } from "./params";
 
+export enum StreamInterval {
+  BySecond = 1,
+  ByMinute = 60,
+  ByHour = 3600,
+  ByDay = 86400,
+  ByWeek = 86400 * 7,
+  By2Week2 = 86400 * 14,
+  ByMonth = 86400 * 30,
+  ByQuater = 86400 * 90,
+  ByYear = 86400 * 360,
+}
+
 const StreamTypeToString = (stream_type: StreamType) => {
   switch (stream_type) {
     case StreamType.TypePayment:

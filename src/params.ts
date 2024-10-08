@@ -55,9 +55,9 @@ export interface BatchCreateOptions {
   cliff_time: AnyNumber;
   start_time: AnyNumber;
   stop_time: AnyNumber;
-  interval: AnyNumber;
+  interval: helper.StreamInterval | AnyNumber;
   auto_withdraw: boolean;
-  auto_withdraw_interval: AnyNumber;
+  auto_withdraw_interval: helper.StreamInterval | AnyNumber;
   pauseable: OperateUser;
   closeable: OperateUser;
   recipient_modifiable: OperateUser;
@@ -139,9 +139,9 @@ export interface CreateStreamOptions {
   cliff_time: AnyNumber;
   start_time: AnyNumber;
   stop_time: AnyNumber;
-  interval: AnyNumber;
+  interval: AnyNumber | helper.StreamInterval;
   auto_withdraw: boolean;
-  auto_withdraw_interval: AnyNumber;
+  auto_withdraw_interval: AnyNumber | helper.StreamInterval;
   pauseable: OperateUser;
   closeable: OperateUser;
   recipient_modifiable: OperateUser;
