@@ -13,6 +13,8 @@ const main = async (options: {
   token: string;
   privateKey: string;
   file: string;
+  batch: number;
+  log: string;
 }) => {
   const logger = getLogger();
   const operatorPrivateKey: string =
@@ -43,6 +45,17 @@ const main = async (options: {
   logger.info("is_fa : %s", is_fa);
 
   logger.info("airdrop list : %d", airdropList.length);
+
+  const batchSize = options.batch;
+  for (let i = 0; i < airdropList.length; i += batchSize) {
+    const batch = airdropList.slice(i, i + batchSize);
+    // logger.info("processing batch %d with size %d", i, batch.length);
+    // logger.info("left %d", airdropList.length - i);
+    appendFileSync(
+      options.log,
+      `processing batch ${i} with size ${batch.length} \n`
+    );
+  }
 };
 
 // Define a default command with options
@@ -51,9 +64,11 @@ program
   .option("-n, --network <network>", "Specify the network")
   .option("-t, --token <token>", "Specify the airdrop token")
   .option("-f, --file <file>", "Specify the csv file to read")
-  .action((options) => {
+  .option("-b, --batch <batch>", "Specify the batch size", "200")
+  .option("-l, --log <log>", "Specify the transaction log file", "batch.log")
+  .action(async (options) => {
     console.log("Executing default command with options...");
-    main(options);
+    await main(options);
   });
 
 program
@@ -85,3 +100,8 @@ program
   });
 
 program.parse(process.argv); // Parse command-line arguments
+
+program.on("close", () => {
+  const logger = getLogger();
+  logger.flush();
+});
