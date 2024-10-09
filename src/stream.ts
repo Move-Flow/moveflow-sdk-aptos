@@ -76,6 +76,10 @@ export class Stream {
     return ContractAddress.Testnet;
   }
 
+  public getNetwork() {
+    return this._network;
+  }
+
   private getEntryFunction(module: string, name: string) {
     return `${this.getContractAddress()}::${module}::${name}`;
   }

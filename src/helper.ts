@@ -1,5 +1,11 @@
-import { AccountAddress } from "@aptos-labs/ts-sdk";
+import {
+  AccountAddress,
+  Network,
+  UserTransactionResponse,
+} from "@aptos-labs/ts-sdk";
 import { OperateUser, StreamType } from "./params";
+import { ContractAddress } from "./config";
+import { helper } from ".";
 
 export enum StreamInterval {
   BySecond = 1,
@@ -50,10 +56,23 @@ const unixSeconds = () => {
   return Math.floor(new Date().getTime() / 1000);
 };
 
+const parseStreamEventFromTransaction = (
+  transaction: UserTransactionResponse,
+  pkg_address: AccountAddress
+) => {
+  const events = transaction.events;
+  const streamEvents = events.filter(
+    (event) =>
+      event.type === `${helper.FixedAddress(pkg_address)}::stream::StreamEvent`
+  );
+  return streamEvents;
+};
+
 export {
   StreamTypeToString,
   OperateUserToString,
   FixedAddress,
   FixedStrAddress,
   unixSeconds,
+  parseStreamEventFromTransaction,
 };
