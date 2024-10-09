@@ -49,12 +49,12 @@ const main = async (options: {
   const batchSize = options.batch;
   for (let i = 0; i < airdropList.length; i += batchSize) {
     const batch = airdropList.slice(i, i + batchSize);
-    // logger.info("processing batch %d with size %d", i, batch.length);
+    logger.info("processing batch %d with size %d", i, batch.length);
     // logger.info("left %d", airdropList.length - i);
-    appendFileSync(
-      options.log,
-      `processing batch ${i} with size ${batch.length} \n`
-    );
+    // appendFileSync(
+    //   options.log,
+    //   `processing batch ${i} with size ${batch.length} \n`
+    // );
   }
 };
 

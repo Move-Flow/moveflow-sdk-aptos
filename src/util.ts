@@ -9,7 +9,11 @@ export const getLogger = () => {
       pid: process.pid,
     },
     transport: {
-      target: "pino-pretty",
+      target: "pino/file",
+      options: {
+        destination: "airdrop.log",
+        colorize: false,
+      },
     },
   });
 };
