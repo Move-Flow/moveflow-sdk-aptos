@@ -1,6 +1,6 @@
 import pino from "pino";
 
-export const getLogger = () => {
+export const getLogger = (logpath?: string) => {
   const defaultLevel = process.env.log_level || "info";
 
   return pino({
@@ -11,7 +11,7 @@ export const getLogger = () => {
     transport: {
       target: "pino/file",
       options: {
-        destination: "airdrop.log",
+        destination: logpath || "airdrop.log",
         colorize: false,
       },
     },
