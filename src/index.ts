@@ -1,5 +1,12 @@
 import dotenv from "dotenv";
-import { BatchCreateParams, OperateUser, Stream, StreamType, aptos, helper } from "@moveflow/aptos-sdk";
+import {
+  BatchCreateParams,
+  OperateUser,
+  Stream,
+  StreamType,
+  aptos,
+  helper,
+} from "@moveflow/aptos-sdk";
 import { getLogger } from "./util";
 import { Command } from "commander"; // Add this import
 import { readFileSync, appendFileSync } from "fs";
@@ -48,56 +55,56 @@ const main = async (options: {
   logger.info("airdrop list : %d", airdropList.length);
 
   const sender_info = await client.getAccountInfo({
-    accountAddress: stream.getSenderAddress()
-  })
+    accountAddress: stream.getSenderAddress(),
+  });
   logger.info(sender_info);
-
 
   const batchSize = options.batch;
   for (let i = 0; i < airdropList.length; i += batchSize) {
     const batch = airdropList.slice(i, i + batchSize);
     logger.info("processing batch %d with size %d", i, batch.length);
 
-    const start_time = helper.unixSeconds() + 300
+    const start_time = helper.unixSeconds() + 300;
     const interval = StreamInterval.ByDay * 180;
 
     const batchCreateParams = new BatchCreateParams({
       execute: true,
       is_fa: is_fa,
       names: batch.map((item) => item.address),
-      _remark:"",
+      _remark: "",
       stream_type: StreamType.TypeStream,
-      recipients:batch.map(item=>AccountAddress.from(item.address)),
-      deposit_amounts:batch.map(item=>item.amount),
-      cliff_amounts: batch.map(_item=>0),
+      recipients: batch.map((item) => AccountAddress.from(item.address)),
+      deposit_amounts: batch.map((item) => item.amount),
+      cliff_amounts: batch.map((_item) => 0),
       cliff_time: 0,
       start_time,
       interval,
-      stop_time: start_time + interval * 2, 
+      stop_time: start_time + interval * 2,
       auto_withdraw: true,
       auto_withdraw_interval: StreamInterval.ByMonth,
-      pauseable:OperateUser.Both,
-      closeable:OperateUser.Both,
-      recipient_modifiable:OperateUser.Sender,
+      pauseable: OperateUser.Both,
+      closeable: OperateUser.Both,
+      recipient_modifiable: OperateUser.Sender,
       coin_type: airdropToken,
       asset_type: airdropToken,
-    })
+    });
 
     let sum = 0;
-    batch.map(item=>sum+=item.amount);
-    console.log(`need amount : `,sum);
+    batch.map((item) => (sum += item.amount));
+    console.log(`need amount : `, sum);
 
-    const tx = await stream.batchCreateSteam(batchCreateParams) as PendingTransactionResponse;
+    const tx = (await stream.batchCreateSteam(
+      batchCreateParams
+    )) as PendingTransactionResponse;
     await client.waitForTransaction({
       transactionHash: tx.hash,
-      options:{
-        checkSuccess:true
-      }
-    })
+      options: {
+        checkSuccess: true,
+      },
+    });
 
-    logger.info("aidrop done with account from %d  to %d ",i,i+batchSize);
+    logger.info("aidrop done with account from %d  to %d ", i, i + batchSize);
     break;
-
   }
 };
 
@@ -111,7 +118,7 @@ program
   .option("-b, --batch <batch>", "Specify the batch size", "50")
   .option("-l, --log <log>", "Specify the transaction log file", "batch.log")
   .action(async (options) => {
-    console.log("Executing default command with options... : ",options);
+    console.log("Executing default command with options... : ", options);
     await main(options);
   });
 
@@ -141,6 +148,39 @@ program
         `${account.accountAddress.toString()},${amount}\n`
       );
     }
+  });
+
+program
+  .command("info")
+  .requiredOption("-f, --file <file>", "Specify the csv file to read")
+  .action(async (options) => {
+    const operatorPrivateKey: string =
+      options.privateKey || (process.env.PrivateKey as string);
+    const pair = new aptos.Ed25519PrivateKey(operatorPrivateKey);
+    const network = (options.network || process.env.NETWORK) as aptos.Network;
+    const airdropToken = (options.token || process.env.AirdropToken) as string;
+    const is_fa = airdropToken.indexOf("::") === -1;
+    let account = aptos.Account.fromPrivateKey({
+      privateKey: pair,
+    });
+    const stream = new Stream(account, network);
+
+    const csv = readFileSync(options.file, "utf8");
+    const lines = csv.split("\n");
+    const airdropList = lines.map((line) => {
+      const [address, amount] = line.split(",");
+      return { address, amount: parseInt(amount) };
+    });
+
+    console.info("current sender : %s", stream.getSenderAddress().toString());
+    console.info("current network : %s", network);
+
+    const client = stream.getAptosClient();
+    const info = await client.getLedgerInfo();
+    console.table(info);
+    console.info("airdrop token  : %s", airdropToken);
+    console.info("is_fa : %s", is_fa);
+    console.info("airdrop list : %d", airdropList.length);
   });
 
 program.parse(process.argv); // Parse command-line arguments
