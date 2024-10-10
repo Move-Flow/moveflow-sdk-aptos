@@ -1,6 +1,6 @@
 # airdrop tool
 
-This is one airdrop tool implement with **moveflow** protocal.
+This is one airdrop tool implement with **moveflow** protocal .
 
 ## How to usage
 
