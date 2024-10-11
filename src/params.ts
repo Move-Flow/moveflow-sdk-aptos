@@ -70,6 +70,16 @@ export class BatchCreateParams {
     this._options = options;
   }
 
+  getNeedAmount() {
+    let need_amount = 0;
+    this._options.deposit_amounts.forEach((amount) => {
+      if (typeof amount === "number") {
+        need_amount += amount;
+      }
+    });
+    return need_amount;
+  }
+
   getTypeArguments() {
     return this._options.is_fa ? [] : [this._options.coin_type as string];
   }

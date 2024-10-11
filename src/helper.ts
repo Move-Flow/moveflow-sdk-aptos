@@ -16,6 +16,7 @@ export enum StreamInterval {
   By2Week2 = 86400 * 14,
   ByMonth = 86400 * 30,
   ByQuater = 86400 * 90,
+  By180Days = 86400 * 180,
   ByYear = 86400 * 360,
 }
 

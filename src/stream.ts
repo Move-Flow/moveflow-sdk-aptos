@@ -76,6 +76,15 @@ export class Stream {
     return ContractAddress.Testnet;
   }
 
+  public async getBalance(coin_type: string | AccountAddress) {
+    const client = this.getAptosClient();
+    return await client.getAccountCoinAmount({
+      accountAddress: this.getSenderAddress(),
+      coinType: coin_type as any,
+      faMetadataAddress: coin_type as any,
+    });
+  }
+
   public getNetwork() {
     return this._network;
   }
